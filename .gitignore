@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+.idea/
+.DS_Store
+.aws-sam/
+.pytest_cache/
+.ruff_cache/
+*.env
+samconfig.toml
