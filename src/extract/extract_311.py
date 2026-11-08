@@ -1,15 +1,27 @@
 """Extract NYC 311 service requests from the Socrata API for a date range.
 
-Usage: python -m src.extract.extract_311 --start 2026-10-01 --end 2026-10-05
+Usage: python -m src.extract.extract_311 --start 2026-10-01 --end 2026-10-04
 """
 
 from datetime import date, timedelta
 
-import requests
-
-from src.extract.common import get_logger, parse_args, split_by_day, write_json
+from src.extract.common import get_json, get_logger, parse_args, split_by_day, write_json
 
 URL = "https://data.cityofnewyork.us/resource/erm2-nwe9.json"
+# Only the columns silver uses. Asking for all ~40 columns makes each page ~40x slower.
+FIELDS = [
+    "unique_key",
+    "created_date",
+    "closed_date",
+    "agency",
+    "complaint_type",
+    "descriptor",
+    "borough",
+    "incident_zip",
+    "status",
+    "latitude",
+    "longitude",
+]
 PAGE_SIZE = 10_000
 MAX_RECORDS = 50_000
 SOURCE = "nyc_311"
@@ -26,14 +38,13 @@ def build_where(start: date, end: date) -> str:
 def fetch_page(where: str, offset: int) -> list[dict]:
     """Fetch one page of records, ordered by unique_key so paging is stable."""
     params = {
+        "$select": ",".join(FIELDS),
         "$where": where,
         "$order": "unique_key",
         "$limit": PAGE_SIZE,
         "$offset": offset,
     }
-    response = requests.get(URL, params=params, timeout=60)
-    response.raise_for_status()
-    return response.json()
+    return get_json(URL, params)
 
 
 def fetch(start: date, end: date) -> list[dict]:

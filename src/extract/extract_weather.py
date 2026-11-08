@@ -1,13 +1,11 @@
 """Extract hourly historical weather for New York City from Open-Meteo.
 
-Usage: python -m src.extract.extract_weather --start 2026-10-01 --end 2026-10-05
+Usage: python -m src.extract.extract_weather --start 2026-10-01 --end 2026-10-04
 """
 
 from datetime import date
 
-import requests
-
-from src.extract.common import get_logger, parse_args, split_by_day, write_json
+from src.extract.common import get_json, get_logger, parse_args, split_by_day, write_json
 
 URL = "https://archive-api.open-meteo.com/v1/archive"
 NYC_LATITUDE = 40.7128
@@ -39,9 +37,7 @@ def fetch(start: date, end: date) -> list[dict]:
         "hourly": ",".join(HOURLY_FIELDS),
         "timezone": "America/New_York",
     }
-    response = requests.get(URL, params=params, timeout=60)
-    response.raise_for_status()
-    return to_rows(response.json()["hourly"])
+    return to_rows(get_json(URL, params)["hourly"])
 
 
 def main(argv: list[str] | None = None) -> None:

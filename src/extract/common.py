@@ -1,12 +1,37 @@
-"""Shared helpers for the extract scripts: CLI args, JSON logging, file writing."""
+"""Shared helpers for the extract scripts: CLI args, HTTP, JSON logging, file writing."""
 
 import argparse
 import json
 import logging
 from datetime import date
 from pathlib import Path
+from typing import Any
+
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 RAW_DIR = Path("data/raw")
+TIMEOUT_SECONDS = 120
+
+
+def get_json(url: str, params: dict) -> Any:
+    """GET a URL and return the JSON body.
+
+    Retries up to 5 times with growing waits on 429 (rate limit) and 5xx errors,
+    then raises requests.HTTPError if the request still fails.
+    """
+    retry = Retry(
+        total=5,
+        backoff_factor=5,
+        status_forcelist=[429, 500, 502, 503, 504],
+        raise_on_status=False,
+    )
+    with requests.Session() as session:
+        session.mount("https://", HTTPAdapter(max_retries=retry))
+        response = session.get(url, params=params, timeout=TIMEOUT_SECONDS)
+    response.raise_for_status()
+    return response.json()
 
 
 class JsonFormatter(logging.Formatter):

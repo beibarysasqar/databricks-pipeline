@@ -28,6 +28,7 @@ def test_fetch_pages_until_short_page(requests_mock, monkeypatch) -> None:
     assert [r["unique_key"] for r in records] == ["1", "2", "3"]
     assert requests_mock.call_count == 2
     assert requests_mock.request_history[1].qs["$offset"] == ["2"]
+    assert requests_mock.request_history[0].qs["$select"] == [",".join(extract_311.FIELDS)]
 
 
 def test_fetch_stops_at_max_records_and_warns(requests_mock, monkeypatch, caplog) -> None:
