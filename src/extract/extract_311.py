@@ -1,6 +1,6 @@
 """Extract NYC 311 service requests from the Socrata API for a date range.
 
-Usage: python -m src.extract.extract_311 --start 2026-10-01 --end 2026-10-06
+Usage: python -m src.extract.extract_311 --start 2026-10-01 --end 2026-10-05
 """
 
 from datetime import date, timedelta
@@ -37,7 +37,10 @@ def fetch_page(where: str, offset: int) -> list[dict]:
 
 
 def fetch(start: date, end: date) -> list[dict]:
-    """Fetch all pages until a short page or MAX_RECORDS is reached."""
+    """Fetch all pages until a short page or MAX_RECORDS is reached.
+
+    Hitting MAX_RECORDS means the last day is probably cut off, so we log a warning.
+    """
     where = build_where(start, end)
     records: list[dict] = []
     while len(records) < MAX_RECORDS:
@@ -46,6 +49,11 @@ def fetch(start: date, end: date) -> list[dict]:
         logger.info("page fetched", extra={"extra_fields": {"rows": len(page)}})
         if len(page) < PAGE_SIZE:
             break
+    if len(records) >= MAX_RECORDS:
+        logger.warning(
+            "MAX_RECORDS reached, last day may be incomplete; use a shorter date range",
+            extra={"extra_fields": {"max_records": MAX_RECORDS}},
+        )
     return records[:MAX_RECORDS]
 
 

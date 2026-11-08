@@ -1,6 +1,6 @@
 """Extract hourly historical weather for New York City from Open-Meteo.
 
-Usage: python -m src.extract.extract_weather --start 2026-10-01 --end 2026-10-06
+Usage: python -m src.extract.extract_weather --start 2026-10-01 --end 2026-10-05
 """
 
 from datetime import date

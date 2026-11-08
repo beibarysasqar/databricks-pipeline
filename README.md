@@ -45,17 +45,19 @@ pip install -r requirements-dev.txt
 pytest -q
 ruff check . && ruff format --check .
 
-python -m src.extract.extract_311 --start 2026-10-25 --end 2026-10-30
-python -m src.extract.extract_weather --start 2026-10-25 --end 2026-10-30
+python -m src.extract.extract_311 --start 2026-10-26 --end 2026-10-30
+python -m src.extract.extract_weather --start 2026-10-26 --end 2026-10-30
 ```
 
 For the Databricks part, follow [docs/setup.md](docs/setup.md).
 
-## Why about 6 days of data?
+## Why about 5 days of data?
 
-- NYC gets roughly 8–9K 311 requests a day, so 6 days is about 50K rows: big enough to be
+- NYC gets roughly 9K 311 requests a day, so 5 days is about 45K rows: big enough to be
   realistic, small enough to extract in a minute and run on Databricks Free Edition.
-- Weather is hourly, so the same 6 days is about 144 rows. That is enough to compare
+- The extractor stops at 50K rows as a safety cap and logs a warning if it hits it,
+  because then the last day would be incomplete. 5 days stays safely under the cap.
+- Weather is hourly, so the same 5 days is about 120 rows. That is enough to compare
   rainy days with dry ones.
 - The end date should be at least a week ago, because the Open-Meteo archive lags by
   about 5 days and recent 311 records are still being filled in.

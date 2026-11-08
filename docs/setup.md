@@ -31,7 +31,7 @@ profile other than `DEFAULT`, set `DATABRICKS_CONFIG_PROFILE=<name>`.
 ```bash
 export DBX_CATALOG=main
 export DBX_SCHEMA=nyc_pipeline
-bash scripts/extract_and_upload.sh 2026-10-25 2026-10-30
+bash scripts/extract_and_upload.sh 2026-10-26 2026-10-30
 ```
 
 The script runs both extractors locally, then copies `data/raw` into the Volume with

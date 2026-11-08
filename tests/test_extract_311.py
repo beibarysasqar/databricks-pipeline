@@ -30,12 +30,13 @@ def test_fetch_pages_until_short_page(requests_mock, monkeypatch) -> None:
     assert requests_mock.request_history[1].qs["$offset"] == ["2"]
 
 
-def test_fetch_stops_at_max_records(requests_mock, monkeypatch) -> None:
+def test_fetch_stops_at_max_records_and_warns(requests_mock, monkeypatch, caplog) -> None:
     monkeypatch.setattr(extract_311, "PAGE_SIZE", 2)
     monkeypatch.setattr(extract_311, "MAX_RECORDS", 3)
     requests_mock.get(URL, json=[{"unique_key": "x"}, {"unique_key": "y"}])
     records = fetch(date(2026, 10, 1), date(2026, 10, 1))
     assert len(records) == 3
+    assert "MAX_RECORDS reached" in caplog.text
 
 
 def test_fetch_raises_on_http_error(requests_mock) -> None:
