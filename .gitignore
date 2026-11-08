@@ -2,8 +2,8 @@
 __pycache__/
 .idea/
 .DS_Store
-.aws-sam/
 .pytest_cache/
 .ruff_cache/
+.env
 *.env
-samconfig.toml
+data/

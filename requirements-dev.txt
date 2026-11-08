@@ -1,6 +1,4 @@
-boto3
 requests
 pytest
-moto
 requests-mock
 ruff
